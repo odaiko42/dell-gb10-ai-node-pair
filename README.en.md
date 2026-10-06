@@ -76,13 +76,18 @@ torchrun --nnodes=2 --nproc-per-node=1 --node-rank=<0|1> \
 | Throughput (`llama-bench`, RPC split) | Qwen2.5-14B-Instruct, Q4_K_M (8.37 GiB) | Prompt processing: **1566.75 t/s** · Generation: **20.35 t/s** · VRAM: ~5.3 GiB (local) + ~3.7 GiB (remote) |
 | Network validation (`test_dual_gb10.sh`) | — | 9 PASS / 0 FAIL / 1 SKIP (iperf3 not installed on one of the two nodes at measurement time) |
 | Large-scale test (`bench_scale_model_split_rpc.sh`) | Qwen2.5-72B-Instruct, Q4_K_M (~41 GiB, auto-split) | Load time: **68.2 s** · Network throughput during loading: **3.17 Gb/s** (1.6 % of the 200 Gb/s link) · VRAM: ~17.7 GiB (local) + ~26.0 GiB (remote) · Prompt: **51.76 t/s** · Generation: **4.55 t/s** · No disruption of existing workloads on the remote node |
+| Very large-scale test (`bench_scale_model_split_rpc.sh`) | Qwen2.5-72B-Instruct, **FP16** (~135.9 GiB, 42 files, auto-split) | Load time: **284.1 s** · Volume transferred: **73.8 GiB** · Network throughput during loading: **2.23 Gb/s** (1.1 % of the 200 Gb/s link) · VRAM: ~64.1 GiB (local) + ~71.8 GiB (remote) · Prompt: **24.11 t/s** · Generation: **1.65 t/s** · No disruption of existing workloads on the remote node |
 
 These results show a genuine partitioning of the model across both nodes (not a duplicated load),
 with throughput measured reproducibly via the inference engine's native API. The network throughput
 during loading stays well below the CX7 link's nominal capacity (the limiting factor is disk reads
 and CPU-side tensor deserialization, not the network), and the generation throughput for a model of
 this size split over RPC is markedly lower than for a smaller model (14B), since each generated
-token crosses the network once more for every layer hosted on the remote node.
+token crosses the network once more for every layer hosted on the remote node. The FP16 test
+(~136 GB) illustrates the cluster's real combined capacity once both nodes' production workloads are
+temporarily freed: over 200 GiB of combined unified memory remain measurable, but a model this size
+saturates the RPC link's memory bandwidth and reduces generation throughput accordingly — a
+trade-off to weigh against the intended use case.
 
 ## Roadmap
 

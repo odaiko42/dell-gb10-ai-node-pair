@@ -77,6 +77,7 @@ torchrun --nnodes=2 --nproc-per-node=1 --node-rank=<0|1> \
 | Débit (`llama-bench`, RPC split) | Qwen2.5-14B-Instruct, Q4_K_M (8.37 GiB) | Prompt processing : **1566.75 t/s** · Génération : **20.35 t/s** · VRAM : ~5.3 GiB (local) + ~3.7 GiB (distant) |
 | Validation réseau (`test_dual_gb10.sh`) | — | 9 PASS / 0 FAIL / 1 SKIP (iperf3 non installé sur un des deux nœuds lors de la mesure) |
 | Test à grande échelle (`bench_scale_model_split_rpc.sh`) | Qwen2.5-72B-Instruct, Q4_K_M (~41 GiB, auto-réparti) | Chargement : **68.2 s** · Débit réseau pendant le chargement : **3.17 Gb/s** (1.6 % du lien 200 Gb/s) · VRAM : ~17.7 GiB (local) + ~26.0 GiB (distant) · Prompt : **51.76 t/s** · Génération : **4.55 t/s** · Aucune perturbation des charges existantes sur le nœud distant |
+| Test à très grande échelle (`bench_scale_model_split_rpc.sh`) | Qwen2.5-72B-Instruct, **FP16** (~135.9 GiB, 42 fichiers, auto-réparti) | Chargement : **284.1 s** · Volume transféré : **73.8 GiB** · Débit réseau pendant le chargement : **2.23 Gb/s** (1.1 % du lien 200 Gb/s) · VRAM : ~64.1 GiB (local) + ~71.8 GiB (distant) · Prompt : **24.11 t/s** · Génération : **1.65 t/s** · Aucune perturbation des charges existantes sur le nœud distant |
 
 Ces résultats montrent un partitionnement réel du modèle entre les deux nœuds (et non un chargement
 dupliqué), avec un débit mesuré de façon reproductible via l'API native de l'outil d'inférence. Le
@@ -84,6 +85,10 @@ débit réseau pendant le chargement reste très en-deçà de la capacité nomin
 limitant est la lecture disque et le débit de désérialisation des tenseurs, pas le réseau), et le débit
 de génération d'un modèle de cette taille réparti sur RPC est nettement plus faible que sur un modèle
 plus petit (14B) en raison de la latence réseau ajoutée à chaque couche distante traversée par token.
+Le test FP16 (~136 Go) illustre la capacité combinée réelle des deux nœuds une fois leurs charges de
+production respectives libérées temporairement : plus de 200 GiB de mémoire unifiée combinée restent
+mesurables, mais un modèle de cette taille sature la bande passante mémoire du lien RPC et fait chuter
+le débit de génération en conséquence — un compromis à évaluer selon le cas d'usage visé.
 
 ## Feuille de route
 

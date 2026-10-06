@@ -69,7 +69,42 @@ périodique + arrêt préventif pendant le chargement).
   déclencher d'arrêt préventif, signe que la marge de sécurité appliquée (12 Gio) était suffisante
   dans les conditions du test.
 
-## 5. Validation réseau/SSH/RDMA (`test_dual_gb10.sh`)
+## 5. Test à très grande échelle (`bench_scale_model_split_rpc.sh`), modèle ~140 Gio (FP16)
+
+Ce test pousse la méthode du point 4 beaucoup plus loin : chargement d'un modèle non quantifié
+(FP16) de ~136 GiB, en libérant temporairement les charges de production du nœud distant (arrêt
+contrôlé de deux services + un conteneur, redémarrage garanti après le test) pour disposer d'assez
+de mémoire combinée. Objectif : mesurer la capacité réelle du cluster proche de son plafond
+théorique, et le compromis débit/taille qui en résulte.
+
+| Métrique | Valeur |
+|---|---|
+| Modèle | Qwen2.5-72B-Instruct, FP16 (~135.9 GiB, 42 fichiers) |
+| Capacité combinée utilisable au moment du test | ~189.5 GiB (marge de sécurité 16 GiB/nœud, charges de prod temporairement arrêtées côté distant) |
+| Répartition (`-ts`) | proportionnelle à la mémoire libre de chaque nœud (102920,91159) |
+| Temps de chargement | 284.05 s |
+| Volume transféré pendant le chargement | 73.78 GiB (émis, local) / 73.77 GiB (reçu, distant) |
+| Débit réseau pendant le chargement | 2.23 Gb/s (1.1 % du lien 200 Gb/s nominal) |
+| VRAM locale après chargement | ~64.1 GiB |
+| VRAM distante après chargement (processus RPC) | ~71.8 GiB |
+| Débit prompt | 24.11 t/s (16 tokens) |
+| Débit génération | 1.65 t/s (67 tokens) |
+| Perturbation des charges de production existantes sur le nœud distant | Aucune (VRAM du processus de production préexistant inchangée ; services redémarrés et vérifiés sains immédiatement après le test) |
+
+**Observations :**
+- Avec un modèle deux fois plus volumineux que le test Q4_K_M du point 4, le temps de chargement
+  augmente proportionnellement plus que la taille (284 s vs 68 s pour ~3.3× plus de données), signe
+  que la désérialisation CPU et/ou la pression mémoire deviennent le facteur limitant à cette échelle.
+- Le débit de génération (1.65 t/s) illustre le compromis direct entre taille de modèle non quantifié
+  et latence d'inférence répartie par RPC : chaque couche distante ajoute une traversée réseau par
+  token, et le volume de données par couche double par rapport à une quantification Q4_K_M.
+- Ce test nécessite de libérer temporairement de la mémoire côté nœud distant (arrêt contrôlé de
+  charges de production non liées au test, redémarrage systématique après coup, avec vérification
+  de santé complète : absence d'OOM, VRAM des processus de production inchangée, endpoints HTTP de
+  production répondant normalement). Il illustre la capacité combinée maximale mesurable du
+  cluster, pas un mode de fonctionnement courant.
+
+## 6. Validation réseau/SSH/RDMA (`test_dual_gb10.sh`)
 
 | Métrique | Valeur |
 |---|---|
