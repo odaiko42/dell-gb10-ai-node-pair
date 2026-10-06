@@ -1,0 +1,19 @@
+network:
+  version: 2
+  ethernets:
+    # Remplacer par les noms d'interfaces reellement observes (ip -br link / ibdev2netdev).
+    # Ne pas appliquer ce fichier tel quel.
+    CX7_LOGICAL_1:
+      dhcp4: false
+      dhcp6: false
+      accept-ra: false
+      addresses: [10.10.0.1/30]   # .1 sur Node-A, .2 sur Node-B
+      mtu: 1500
+      optional: true
+    CX7_LOGICAL_2:
+      dhcp4: false
+      dhcp6: false
+      accept-ra: false
+      addresses: [10.10.1.1/30]   # .1 sur Node-A, .2 sur Node-B
+      mtu: 1500
+      optional: true

@@ -1,0 +1,17 @@
+# Exemple de config SSH client pour la liaison inter-noeuds dediee.
+# A adapter : IP reelles, utilisateur dedie, chemin de la cle.
+# Ne jamais reutiliser cette cle pour un autre usage.
+
+Host node-a-cx7
+    HostName 10.10.0.1
+    User mluser
+    IdentityFile ~/.ssh/id_ed25519_cluster
+    IdentitiesOnly yes
+    StrictHostKeyChecking accept-new
+
+Host node-b-cx7
+    HostName 10.10.0.2
+    User mluser
+    IdentityFile ~/.ssh/id_ed25519_cluster
+    IdentitiesOnly yes
+    StrictHostKeyChecking accept-new
