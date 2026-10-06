@@ -1,5 +1,7 @@
 # Dépannage
 
+🌐 **Langue / Language:** Français (actuel) · [English](en/troubleshooting.md)
+
 ## Mémoire unifiée Grace Blackwell : piège de diagnostic
 
 - `nvidia-smi --query-gpu=memory.total,memory.used,memory.free` peut renvoyer des champs vides

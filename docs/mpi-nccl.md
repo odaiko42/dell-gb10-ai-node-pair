@@ -1,5 +1,7 @@
 # MPI / NCCL
 
+🌐 **Langue / Language:** Français (actuel) · [English](en/mpi-nccl.md)
+
 ## Objectif
 
 Valider qu'une collective NCCL minimale (`all_reduce`) fonctionne correctement entre les deux nœuds

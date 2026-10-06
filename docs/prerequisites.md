@@ -1,5 +1,7 @@
 # Prérequis
 
+🌐 **Langue / Language:** Français (actuel) · [English](en/prerequisites.md)
+
 ## Matériel
 
 - 2 × nœuds GB10 (ou équivalent NVIDIA Grace Blackwell, mémoire unifiée), 128 Go chacun.

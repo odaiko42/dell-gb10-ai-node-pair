@@ -1,5 +1,7 @@
 # Contribuer
 
+🌐 **Langue / Language:** Français (actuel) · [English](CONTRIBUTING.en.md)
+
 Merci de l'intérêt porté à ce dépôt.
 
 ## Proposer un changement

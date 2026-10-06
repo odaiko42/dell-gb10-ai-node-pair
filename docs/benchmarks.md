@@ -1,5 +1,7 @@
 # Résultats de benchmark détaillés
 
+🌐 **Langue / Language:** Français (actuel) · [English](en/benchmarks.md)
+
 Toutes les mesures ci-dessous ont été produites avec les scripts de ce dépôt, sur une paire de
 nœuds GB10 réels (adresses et noms anonymisés, voir [networking.md](networking.md)). Les valeurs
 de débit/temps sont spécifiques au matériel, au modèle et à la charge du nœud partagé au moment du

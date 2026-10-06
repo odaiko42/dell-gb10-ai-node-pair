@@ -1,5 +1,7 @@
 # Réseau
 
+🌐 **Langue / Language:** Français (actuel) · [English](en/networking.md)
+
 ## Plan d'adressage proposé
 
 | Plan | Node-A | Node-B | Usage |

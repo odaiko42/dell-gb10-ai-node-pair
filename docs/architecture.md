@@ -1,5 +1,7 @@
 # Architecture
 
+🌐 **Langue / Language:** Français (actuel) · [English](en/architecture.md)
+
 ## Vue d'ensemble
 
 Deux nœuds GB10 (NVIDIA Grace Blackwell, 128 Go de mémoire unifiée chacun, soit 256 Go cumulés)

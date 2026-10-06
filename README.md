@@ -1,5 +1,7 @@
 # dell-gb10-ai-node-pair
 
+🌐 **Langue / Language:** Français (actuel) · [English](README.en.md)
+
 Scripts & documentation pour mettre en cluster deux nœuds NVIDIA GB10 (Grace Blackwell, 128 Go de
 mémoire unifiée chacun) via une liaison directe ConnectX-7, pour l'entraînement distribué et
 l'inférence répartie de LLMs.
