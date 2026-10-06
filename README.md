@@ -36,6 +36,7 @@ flowchart LR
 
 Détails : [docs/architecture.md](docs/architecture.md) · réseau : [docs/networking.md](docs/networking.md)
 · NCCL/MPI : [docs/mpi-nccl.md](docs/mpi-nccl.md) · dépannage : [docs/troubleshooting.md](docs/troubleshooting.md)
+· résultats détaillés : [docs/benchmarks.md](docs/benchmarks.md)
 
 ## Démarrage rapide
 
@@ -73,9 +74,14 @@ torchrun --nnodes=2 --nproc-per-node=1 --node-rank=<0|1> \
 | Validation fonctionnelle (RPC split) | Qwen2.5-3B-Instruct, Q4_K_M (~2 Go) | VRAM répartie : ~2.9 GiB (local) + ~0.9 GiB (distant) — tenseurs réellement partitionnés, réponse correcte |
 | Débit (`llama-bench`, RPC split) | Qwen2.5-14B-Instruct, Q4_K_M (8.37 GiB) | Prompt processing : **1566.75 t/s** · Génération : **20.35 t/s** · VRAM : ~5.3 GiB (local) + ~3.7 GiB (distant) |
 | Validation réseau (`test_dual_gb10.sh`) | — | 9 PASS / 0 FAIL / 1 SKIP (iperf3 non installé sur un des deux nœuds lors de la mesure) |
+| Test à grande échelle (`bench_scale_model_split_rpc.sh`) | Qwen2.5-72B-Instruct, Q4_K_M (~41 GiB, auto-réparti) | Chargement : **68.2 s** · Débit réseau pendant le chargement : **3.17 Gb/s** (1.6 % du lien 200 Gb/s) · VRAM : ~17.7 GiB (local) + ~26.0 GiB (distant) · Prompt : **51.76 t/s** · Génération : **4.55 t/s** · Aucune perturbation des charges existantes sur le nœud distant |
 
 Ces résultats montrent un partitionnement réel du modèle entre les deux nœuds (et non un chargement
-dupliqué), avec un débit mesuré de façon reproductible via l'API native de l'outil d'inférence.
+dupliqué), avec un débit mesuré de façon reproductible via l'API native de l'outil d'inférence. Le
+débit réseau pendant le chargement reste très en-deçà de la capacité nominale du lien CX7 (le facteur
+limitant est la lecture disque et le débit de désérialisation des tenseurs, pas le réseau), et le débit
+de génération d'un modèle de cette taille réparti sur RPC est nettement plus faible que sur un modèle
+plus petit (14B) en raison de la latence réseau ajoutée à chaque couche distante traversée par token.
 
 ## Feuille de route
 
@@ -86,10 +92,8 @@ dupliqué), avec un débit mesuré de façon reproductible via l'API native de l
 - [x] Script auto-adaptatif pour un test à grande échelle (chargement, saturation du lien CX7) avec
       garde-fous mémoire (re-check périodique + arrêt préventif) — voir
       [scripts/bench_scale_model_split_rpc.sh](scripts/bench_scale_model_split_rpc.sh)
-- [ ] Résultats du test à grande échelle avec un modèle proche de la capacité combinée (~70B+) —
-      à ajouter une fois qu'une fenêtre de marge mémoire suffisante et stable sera disponible sur le
-      second nœud (voir [docs/troubleshooting.md](docs/troubleshooting.md) pour le retour d'expérience
-      sur la volatilité mémoire d'un nœud partagé)
+- [x] Résultats du test à grande échelle avec un modèle proche de ~70B (voir tableau ci-dessus et
+      [docs/benchmarks.md](docs/benchmarks.md) pour le détail complet)
 
 ## Sécurité
 
